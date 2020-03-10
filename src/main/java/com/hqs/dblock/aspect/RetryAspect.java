@@ -34,10 +34,11 @@ public class RetryAspect {
                         log.info("retry excceed the max times..");
                         throw e;
                     }
+                }else {
+                    throw e;
                 }
 
             }
-        } while (attempts < MAX_RETRY_TIMES);
-        return  null;
+        } while (true);
     }
 }

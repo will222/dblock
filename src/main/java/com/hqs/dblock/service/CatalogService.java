@@ -24,8 +24,11 @@ public class CatalogService {
 
     @Transactional(rollbackFor = Exception.class)
     public void browseCatalog(Long catalogId, String user) {
+        //使用乐观锁
         Optional<Catalog>  catalogOptional = catalogRepository.findById(catalogId);
+        //使用悲观锁
 //        Optional<Catalog>  catalogOptional = catalogRepository.findCatalogsForUpdate(catalogId);
+        // @Lock(value = LockModeType.PESSIMISTIC_WRITE)
 //        Optional<Catalog>  catalogOptional = catalogRepository.findCatalogWithPessimisticLock(catalogId);
         if(!catalogOptional.isPresent()) {
             throw new RuntimeException("no catalog found");
@@ -37,7 +40,12 @@ public class CatalogService {
         browse.setUser(user);
         browseRepository.save(browse);
 
-        /*int result = catalogRepository.updateCatalogWithVersion(catalogId, catalog.getBrowseCount()+1,
+        /*使用
+            1、catalogRepository.save(catalog)
+         * 2、updateCatalogWithVersion
+         均是乐观锁
+         */
+/*        int result = catalogRepository.updateCatalogWithVersion(catalogId, catalog.getBrowseCount()+1,
                 catalog.getVersion());
 
         if(result == 0) {
